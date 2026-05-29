@@ -1,0 +1,73 @@
+import { useState } from "react"
+
+import {
+  signInWithEmailAndPassword
+} from "firebase/auth"
+
+import { auth } from "../firebase"
+
+import { useNavigate } from "react-router-dom"
+
+function Login(){
+
+  const navigate = useNavigate()
+
+  const [email,setEmail] = useState("")
+  const [password,setPassword] = useState("")
+
+  const loginUser = async()=>{
+
+    try{
+
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+
+      navigate("/dashboard")
+
+    }catch(error){
+
+      alert(error.message)
+    }
+  }
+
+  return(
+
+    <div className="h-screen flex justify-center items-center bg-black">
+
+      <div className="bg-gray-900 p-10 rounded-3xl w-[350px]">
+
+        <h1 className="text-white text-3xl mb-6">
+          NeoTrade AI
+        </h1>
+
+        <input
+          type="email"
+          placeholder="Email"
+          onChange={(e)=>setEmail(e.target.value)}
+          className="w-full p-3 rounded-xl mb-4"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={(e)=>setPassword(e.target.value)}
+          className="w-full p-3 rounded-xl mb-4"
+        />
+
+        <button
+          onClick={loginUser}
+          className="bg-blue-500 w-full p-3 rounded-xl text-white"
+        >
+          Login
+        </button>
+
+      </div>
+
+    </div>
+  )
+}
+
+export default Login

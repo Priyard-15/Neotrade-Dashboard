@@ -1,0 +1,46 @@
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts"
+
+function TrendChart(){
+
+  const data = [
+    {day:"Mon",price:100},
+    {day:"Tue",price:220},
+    {day:"Wed",price:170},
+    {day:"Thu",price:280},
+    {day:"Fri",price:240},
+  ]
+
+  return(
+    <div className="bg-gray-800 p-6 rounded-2xl mt-10">
+
+      <h1 className="text-2xl font-bold mb-5">
+        Weekly Trend Analysis
+      </h1>
+
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data}>
+
+          <XAxis dataKey="day" />
+          <YAxis />
+          <Tooltip />
+
+          <Line
+            type="monotone"
+            dataKey="price"
+          />
+
+        </LineChart>
+      </ResponsiveContainer>
+
+    </div>
+  )
+}
+
+export default TrendChart

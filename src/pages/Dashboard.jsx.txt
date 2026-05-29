@@ -1,0 +1,258 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { auth } from "../firebase";
+
+import Sidebar from "../components/Sidebar";
+import StockCard from "../components/StockCard";
+import TrendChart from "../components/TrendChart";
+import stocks from "../data/stocks";
+
+function Dashboard() {
+
+  // STATES
+  const [search, setSearch] = useState("AAPL");
+  const [stock, setStock] = useState(null);
+  const [portfolio, setPortfolio] = useState([]);
+  const [watchlist, setWatchlist] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
+  const [dark, setDark] = useState(true);
+
+  // SYMBOL MAP (IMPORTANT FIX)
+  const symbols = {
+    apple: "AAPL",
+    tesla: "TSLA",
+    nvidia: "NVDA",
+    google: "GOOGL",
+    amazon: "AMZN",
+    microsoft: "MSFT",
+    meta: "META",
+    netflix: "NFLX"
+  };
+
+  // FETCH STOCK
+  const getStock = async () => {
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const finalSearch =
+        symbols[search.toLowerCase()] ||
+        search.toUpperCase();
+
+      const res = await axios.get(
+        `https://finnhub.io/api/v1/quote?symbol=${finalSearch}&token=YOUR_API_KEY`
+      );
+
+      setStock(res.data);
+
+    } catch (err) {
+      setError("Failed to fetch stock data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // LOAD DEFAULT
+  useEffect(() => {
+    getStock();
+  }, []);
+
+  // USER
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (currentUser) setUser(currentUser);
+  }, []);
+
+  // AI PREDICTION (IMPROVED)
+  const prediction = stock
+    ? stock.c > stock.pc
+      ? "Bullish Trend 📈"
+      : "Bearish Trend 📉"
+    : "";
+
+  return (
+
+    <div className={`flex min-h-screen transition-all duration-300
+      ${dark ? "bg-gray-950 text-white" : "bg-white text-black"}`}>
+
+      <Sidebar />
+
+      <div className="flex-1 p-8">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-8">
+
+          <div>
+            <h1 className="text-4xl font-bold">
+              Stock Market Dashboard
+            </h1>
+
+            {user && (
+              <p className="text-gray-400 mt-2">
+                Welcome {user.email}
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={() => setDark(!dark)}
+            className="bg-purple-500 px-4 py-2 rounded-xl"
+          >
+            Toggle Theme
+          </button>
+
+        </div>
+
+        {/* SEARCH */}
+        <div className="flex gap-4 mb-8">
+
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search stock (AAPL or Apple)"
+            className="bg-gray-800 text-white p-4 rounded-xl w-full"
+          />
+
+          <button
+            onClick={getStock}
+            className="bg-green-500 px-6 rounded-xl"
+          >
+            Search
+          </button>
+
+        </div>
+
+        {/* ERROR */}
+        {error && (
+          <div className="bg-red-500 p-4 rounded-xl mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* LOADING */}
+        {loading && (
+          <div className="mb-4">Loading stock data...</div>
+        )}
+
+        {/* STOCK INFO */}
+        {stock && (
+
+          <div className="bg-gray-900 p-6 rounded-3xl mb-10">
+
+            <div className="flex justify-between items-center">
+
+              <h2 className="text-3xl font-bold">
+                {search.toUpperCase()}
+              </h2>
+
+              <span className={stock.d >= 0 ? "text-green-400" : "text-red-400"}>
+                {stock.dp?.toFixed(2)}%
+              </span>
+
+            </div>
+
+            {/* DETAILS */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+
+              <p>Price: ${stock.c}</p>
+              <p>High: ${stock.h}</p>
+              <p>Low: ${stock.l}</p>
+              <p>Open: ${stock.o}</p>
+              <p>Prev Close: ${stock.pc}</p>
+              <p>Change: ${stock.d}</p>
+
+            </div>
+
+            {/* AI PREDICTION */}
+            <div className="mt-6 text-xl font-bold">
+              AI Prediction:
+              <span className={stock.c > stock.pc ? "text-green-400 ml-2" : "text-red-400 ml-2"}>
+                {prediction}
+              </span>
+            </div>
+
+            {/* ACTION BUTTONS */}
+            <div className="flex gap-4 mt-6">
+
+              <button
+                onClick={() => {
+                  const exists = portfolio.find(p => p.c === stock.c);
+                  if (!exists) setPortfolio([...portfolio, stock]);
+                }}
+                className="bg-blue-500 px-4 py-2 rounded-xl"
+              >
+                Add Portfolio
+              </button>
+
+              <button
+                onClick={() => {
+                  const exists = watchlist.includes(search.toUpperCase());
+                  if (!exists) setWatchlist([...watchlist, search.toUpperCase()]);
+                }}
+                className="bg-yellow-500 px-4 py-2 rounded-xl"
+              >
+                Add Watchlist
+              </button>
+
+            </div>
+
+          </div>
+
+        )}
+
+        {/* WATCHLIST */}
+        <div className="bg-gray-900 p-6 rounded-3xl mb-10">
+
+          <h2 className="text-2xl mb-4">Watchlist</h2>
+
+          {watchlist.length === 0 ? (
+            <p>No stocks added</p>
+          ) : (
+            watchlist.map((item, i) => (
+              <div key={i} className="bg-gray-800 p-3 rounded-xl mb-2">
+                {item}
+              </div>
+            ))
+          )}
+
+        </div>
+
+        {/* PORTFOLIO */}
+        <div className="bg-gray-900 p-6 rounded-3xl mb-10">
+
+          <h2 className="text-2xl mb-4">Portfolio</h2>
+
+          {portfolio.length === 0 ? (
+            <p>No stocks added</p>
+          ) : (
+            portfolio.map((item, i) => (
+              <div key={i} className="bg-gray-800 p-3 rounded-xl mb-2">
+                Price: ${item.c} | Change: {item.dp}%
+              </div>
+            ))
+          )}
+
+        </div>
+
+        {/* STATIC STOCKS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
+
+          {stocks.map((s) => (
+            <StockCard key={s.id} stock={s} />
+          ))}
+
+        </div>
+
+        {/* TREND CHART */}
+        <TrendChart />
+
+      </div>
+
+    </div>
+  );
+}
+
+export default Dashboard;
