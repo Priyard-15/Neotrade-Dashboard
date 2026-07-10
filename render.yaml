@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: neotrade-dashboard
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run preview
+    envVars:
+      - key: VITE_FINNHUB_API_KEY
+        scope: build
+        value: ${VITE_FINNHUB_API_KEY}
+      - key: VITE_STARTUP_ANALYTICS_API_BASE_URL
+        scope: build
+        value: ${VITE_STARTUP_ANALYTICS_API_BASE_URL}
+      - key: NODE_ENV
+        value: production

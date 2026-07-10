@@ -1,0 +1,25 @@
+{
+  "name": "neotrade-dashboard",
+  "description": "Stock trend analysis dashboard with AI predictions and anomaly detection",
+  "repository": "https://github.com/your-username/neotrade-dashboard",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "VITE_FINNHUB_API_KEY": {
+      "description": "Finnhub API key for live stock quotes",
+      "required": true,
+      "value": ""
+    },
+    "VITE_STARTUP_ANALYTICS_API_BASE_URL": {
+      "description": "Base URL for startup analytics API (optional)",
+      "required": false,
+      "value": ""
+    }
+  },
+  "scripts": {
+    "postbuild": "npm run build"
+  }
+}

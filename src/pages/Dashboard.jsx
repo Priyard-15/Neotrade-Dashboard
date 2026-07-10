@@ -4,16 +4,22 @@ import { signOut } from "firebase/auth"
 import Sidebar from "../components/Sidebar"
 import StockCard from "../components/StockCard"
 import TrendChart from "../components/TrendChart"
+import AlertDeliveryPanel from "../components/dashboard/AlertDeliveryPanel"
 import AiInsightPanel from "../components/dashboard/AiInsightPanel"
 import AlertsPanel from "../components/dashboard/AlertsPanel"
+import BacktestPanel from "../components/dashboard/BacktestPanel"
 import ComparePanel from "../components/dashboard/ComparePanel"
 import DashboardHeader from "../components/dashboard/DashboardHeader"
 import DecisionEnginePanel from "../components/dashboard/DecisionEnginePanel"
+import InvestmentThesisPanel from "../components/dashboard/InvestmentThesisPanel"
 import MarketNewsPanel from "../components/dashboard/MarketNewsPanel"
 import PortfolioPanel from "../components/dashboard/PortfolioPanel"
 import SectorAllocation from "../components/dashboard/SectorAllocation"
+import StartupIntegrationPanel from "../components/dashboard/StartupIntegrationPanel"
 import StatGrid from "../components/dashboard/StatGrid"
 import StockFilters from "../components/dashboard/StockFilters"
+import AnomalyDetectionPanel from "../components/dashboard/AnomalyDetectionPanel"
+import MLPredictionPanel from "../components/dashboard/MLPredictionPanel"
 import stocks, { marketNews } from "../data/stocks"
 import { auth } from "../firebase"
 import {
@@ -23,6 +29,19 @@ import {
   hasMarketApiKey,
 } from "../services/stockApi"
 import {
+  fetchStartupData,
+  hasStartupApiBaseUrl,
+} from "../services/startupApi"
+import {
+  predictTrendEnsemble,
+} from "../services/mlPrediction"
+import {
+  detectAnomaliesMultivariate,
+  detectReversalPatterns,
+} from "../services/anomalyDetection"
+import {
+  getBacktestMetrics,
+  getInvestmentThesis,
   getMarketMood,
   getPrediction,
   getPredictionTone,
@@ -45,6 +64,11 @@ function Dashboard(){
   const [liveNews, setLiveNews] = useState([])
   const [liveQuotes, setLiveQuotes] = useState({})
   const [marketDataStatus, setMarketDataStatus] = useState("connecting")
+  const [startupId, setStartupId] = useState("")
+  const [startupApiKey, setStartupApiKey] = useState("")
+  const [startupStatus, setStartupStatus] = useState("idle")
+  const [startupError, setStartupError] = useState("")
+  const [startupMetrics, setStartupMetrics] = useState(null)
 
   const selectedStock = stocks.find((stock) => stock.symbol === selectedSymbol) || stocks[0]
   const enrichedStocks = useMemo(() => {
@@ -66,10 +90,10 @@ function Dashboard(){
       }
     })
   }, [liveQuotes])
-  const displayedStock = {
+  const displayedStock = useMemo(() => ({
     ...(enrichedStocks.find((stock) => stock.symbol === selectedSymbol) || selectedStock),
     history: liveCandles.length ? liveCandles : selectedStock.history,
-  }
+  }), [enrichedStocks, liveCandles, selectedStock, selectedSymbol])
 
   const sectors = useMemo(() => {
     return ["All", ...new Set(enrichedStocks.map((stock) => stock.sector))]
@@ -113,17 +137,42 @@ function Dashboard(){
   const sectorAllocation = getSectorAllocation(watchlistStocks)
   const technicalSignal = getTechnicalSignal(displayedStock)
   const portfolioDiagnostics = getPortfolioDiagnostics(watchlistStocks)
+  const backtestMetrics = getBacktestMetrics(displayedStock)
+  const investmentThesis = getInvestmentThesis(displayedStock, riskProfile, technicalSignal, backtestMetrics)
   const displayedNews = liveNews.length ? liveNews : marketNews
+
+  // ML Prediction - Ensemble model for trend forecasting
+  const mlPrediction = useMemo(() => {
+    if (!displayedStock.history || displayedStock.history.length < 5) {
+      return null
+    }
+    const prices = displayedStock.history.map((h) => h.price)
+    return predictTrendEnsemble(prices)
+  }, [displayedStock])
+
+  // Anomaly Detection - Detect unusual patterns
+  const anomalyData = useMemo(() => {
+    if (!displayedStock.history || displayedStock.history.length < 5) {
+      return null
+    }
+    const prices = displayedStock.history.map((h) => h.price)
+    const quote = liveQuotes[displayedStock.symbol]
+    return detectAnomaliesMultivariate(prices, quote)
+  }, [displayedStock, liveQuotes])
+
+  // Reversal Pattern Detection
+  const reversalSignals = useMemo(() => {
+    if (!displayedStock.history || displayedStock.history.length < 10) {
+      return { signals: [], avgConfidence: 0 }
+    }
+    const prices = displayedStock.history.map((h) => h.price)
+    return detectReversalPatterns(prices)
+  }, [displayedStock])
 
   useEffect(() => {
     let ignore = false
 
     async function loadMarketData(){
-      if(!hasMarketApiKey()){
-        setMarketDataStatus("no-key")
-        return
-      }
-
       try{
         const [quoteResult, news] = await Promise.all([
           fetchStockQuotes(stocks.map((stock) => stock.symbol)),
@@ -135,13 +184,17 @@ function Dashboard(){
           setLiveQuotes(quoteResult.quotes)
           setLiveNews(news)
           setMarketDataStatus(
-            quoteResult.rateLimited
-              ? "rate-limited"
-              : quoteCount === stocks.length
-                ? "live"
-                : quoteCount > 0
-                  ? "partial-live"
-                  : "fallback"
+            quoteResult.invalidKey
+              ? "invalid-key"
+              : quoteResult.rateLimited
+                ? "rate-limited"
+                : quoteCount === stocks.length
+                  ? "live"
+                  : quoteCount > 0
+                    ? "partial-live"
+                    : hasMarketApiKey()
+                      ? "fallback"
+                      : "no-key"
           )
         }
       }catch(error){
@@ -161,6 +214,32 @@ function Dashboard(){
       ignore = true
     }
   }, [])
+
+  const loadStartupData = async() => {
+    if(!startupId){
+      setStartupError("Please enter a startup ID.")
+      return
+    }
+
+    if(!hasStartupApiBaseUrl()){
+      setStartupError("Startup API base URL is not configured.")
+      return
+    }
+
+    setStartupStatus("loading")
+    setStartupError("")
+
+    try{
+      const data = await fetchStartupData(startupId, startupApiKey)
+      setStartupMetrics(data)
+      setStartupStatus("success")
+    }catch(error){
+      console.warn(error.message)
+      setStartupError(error.message || "Failed to fetch startup analytics.")
+      setStartupStatus("error")
+      setStartupMetrics(null)
+    }
+  }
 
   useEffect(() => {
     let ignore = false
@@ -274,6 +353,24 @@ function Dashboard(){
           />
         </section>
 
+        <section className="mt-6 grid gap-6 xl:grid-cols-2">
+          <MLPredictionPanel
+            prediction={mlPrediction}
+            stock={displayedStock}
+          />
+
+          <AnomalyDetectionPanel
+            anomalyData={anomalyData}
+            reversalSignals={reversalSignals}
+          />
+        </section>
+
+        <section className="mt-6 grid gap-6 xl:grid-cols-2">
+          <BacktestPanel metrics={backtestMetrics} />
+
+          <InvestmentThesisPanel thesis={investmentThesis} />
+        </section>
+
         <section id="smart-tools" className="mt-6 grid gap-6 xl:grid-cols-2">
           <AlertsPanel
             alertPrice={alertPrice}
@@ -290,12 +387,33 @@ function Dashboard(){
           />
         </section>
 
+        <section className="mt-6">
+          <AlertDeliveryPanel
+            backtestMetrics={backtestMetrics}
+            stock={displayedStock}
+            technicalSignal={technicalSignal}
+          />
+        </section>
+
         <section className="mt-6 grid gap-6 xl:grid-cols-3">
           <PortfolioPanel stocks={watchlistStocks} />
 
           <SectorAllocation allocation={sectorAllocation} />
 
           <MarketNewsPanel newsItems={displayedNews} />
+        </section>
+
+        <section className="mt-6">
+          <StartupIntegrationPanel
+            startupId={startupId}
+            apiKey={startupApiKey}
+            onStartupIdChange={setStartupId}
+            onApiKeyChange={setStartupApiKey}
+            onFetchStartupData={loadStartupData}
+            status={startupStatus}
+            error={startupError}
+            metrics={startupMetrics}
+          />
         </section>
       </main>
     </div>

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "4173:4173"
+    environment:
+      - VITE_FINNHUB_API_KEY=${VITE_FINNHUB_API_KEY}
+      - VITE_STARTUP_ANALYTICS_API_BASE_URL=${VITE_STARTUP_ANALYTICS_API_BASE_URL}
+      - NODE_ENV=production
+    restart: unless-stopped

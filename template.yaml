@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NeoTrade Dashboard - Stock Analysis with ML Predictions
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        VITE_FINNHUB_API_KEY: !Ref FinnhubApiKey
+        VITE_STARTUP_ANALYTICS_API_BASE_URL: !Ref StartupAnalyticsUrl
+
+Parameters:
+  FinnhubApiKey:
+    Type: String
+    NoEcho: true
+    Description: Finnhub API key for live stock quotes
+  
+  StartupAnalyticsUrl:
+    Type: String
+    Default: ''
+    Description: Optional startup analytics API base URL
+
+Resources:
+  NeoTradeBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'neotrade-dashboard-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  NeoTradeDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultRootObject: index.html
+        Origins:
+          - DomainName: !GetAtt NeoTradeBucket.DomainName
+            Id: NeoTradeOrigin
+            S3OriginConfig: {}
+        Enabled: true
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          OriginId: NeoTradeOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+        CacheBehaviors:
+          - PathPattern: index.html
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachePolicyId: 4135ea3d-c35d-46eb-81d7-reeSne5whzsq
+            OriginId: NeoTradeOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            ForwardedValues:
+              QueryString: false
+
+  DeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+Outputs:
+  S3BucketName:
+    Description: S3 bucket for hosting the React app
+    Value: !Ref NeoTradeBucket
+  
+  CloudFrontDistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref NeoTradeDistribution
+  
+  CloudFrontDomainName:
+    Description: CloudFront domain name
+    Value: !GetAtt NeoTradeDistribution.DomainName

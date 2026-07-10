@@ -1,0 +1,386 @@
+1.Write a Python program to print "Hello World".
+
+Code:
+print("Hello World")
+
+Input:
+-
+
+Output:
+Hello World
+
+Time Taken: 20 sec
+
+2.Write a program to add two numbers.
+
+Code:
+a = int(input())
+b = int(input())
+print(a + b)
+
+Input:
+2
+3
+
+Output:
+5
+
+Time Taken: 20 sec
+
+3.Write a program to check whether a number is even or odd.
+
+Code:
+n = int(input())
+if n % 2 == 0:
+  print("Even")
+else:
+  print("Odd")
+
+Input:
+2
+
+Output:
+Even
+
+Time Taken: 20 sec
+
+4.Write a program to check whether a number is positive, negative, or zero.
+
+Code:
+n = int(input())
+if n > 0:
+  print("Positive")
+elif n < 0:
+  print("Negative")
+else:
+  print("Zero")
+
+Input:
+-2
+
+Output:
+Negative
+
+Time Taken: 30 sec
+
+5.Write a program to find the largest of two numbers.
+
+Code:
+
+a = int(input())
+b = int(input())
+if a > b:
+  print(a)
+else:
+  print(b)
+
+Input:
+4
+8
+
+Output:
+8
+
+Time Taken: 30 sec
+
+6.Write a program to find the largest of three numbers.
+
+Code:
+a = int(input())
+b = int(input())
+c = int(input())
+if a >= b and a >= c:
+  print(a)
+elif b >= a and b >= c:
+  print(b)
+else:
+  print(c)
+
+Input:
+10
+25
+18
+
+Output:
+25
+
+Time Taken: 40 sec
+
+7.Write a program to check whether a given year is a leap year.
+
+Code:
+year = int(input())
+if year % 400 == 0 or (year % 4 == 0 and year % 100 != 0):
+  print("Leap Year")
+else:
+  print("Not a Leap Year")
+
+Input:
+2024
+
+Output:
+Leap Year
+
+Time Taken: 45 sec
+
+8.Write a program to print numbers from 1 to 10 using a loop.
+
+Code:
+for i in range(1, 11):
+  print(i)
+
+Input:
+-
+
+Output:
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+Time Taken: 20 sec
+
+9.Write a program to find the sum of numbers from 1 to N.
+
+Code:
+n = int(input())
+total = 0
+for i in range(1, n + 1):
+  total += i
+  print(total)
+
+Input:
+5
+
+Output:
+15
+
+Time Taken: 30 sec
+
+10.Write a program to print the multiplication table of a given number.
+
+Code:
+n = int(input())
+for i in range(1, 11):
+  print(n * i)
+
+Input:
+5
+
+Output:
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+
+Time Taken: 45 sec
+
+11.Write a program to find the factorial of a number.
+
+Code:
+n = int(input())
+fact = 1
+for i in range(1, n + 1):
+  fact *= i
+  print(fact)
+
+Input:
+5
+
+Output:
+120
+
+Time Taken: 45 sec
+
+12.Write a program to check whether a number is prime.
+
+Code:
+n = int(input())
+count = 0
+for i in range(1, n + 1):
+if n % i == 0:
+  count += 1
+  if count == 2:
+    print("Prime")
+  else:
+    print("Not Prime")
+
+Input:
+7
+
+Output:
+Prime
+
+Time Taken: 40 sec
+
+13.Write a program to print all prime numbers between 1 and N.
+
+Code:
+n = int(input())
+for num in range(2, n + 1):
+  count = 0
+  for i in range(1, num + 1):
+    if num % i == 0:
+      count += 1
+      if count == 2:
+        print(num)
+
+Input:
+10
+
+Output:
+2
+3
+5
+7
+
+Time Taken: 90 sec
+
+14.Write a program to reverse a number.
+
+Code:
+n = int(input())
+reverse = 0
+while n > 0:
+  digit = n % 10
+  reverse = reverse * 10 + digit
+  n = n // 10
+  print(reverse)
+
+Input:
+1234
+
+Output:
+4321
+
+Time Taken: 90 sec
+
+15.Write a program to check whether a number is a palindrome.
+
+Code:
+n = int(input())
+original = n
+reverse = 0
+while n > 0:
+  digit = n % 10
+  reverse = reverse * 10 + digit
+  n = n // 10
+  if original == reverse:
+    print("Palindrome")
+  else:
+    print("Not Palindrome")
+
+Input:
+121
+
+Output:
+Palindrome
+
+Time Taken: 90 sec
+
+16.Write a program to reverse a string.
+
+Code:
+s = input()
+reverse = ""
+for ch in s:
+  reverse = ch + reverse
+  print(reverse)
+
+Input:
+hello
+
+Output:
+olleh
+
+Time Taken: 45 sec
+
+17.Write a program to check whether a string is a palindrome.
+
+Code:
+s = input()
+reverse = ""
+for ch in s:
+  reverse = ch + reverse
+  if s == reverse:
+    print("Palindrome")
+  else:
+    print("Not Palindrome")
+
+Input:
+madam
+
+Output:
+Palindrome
+
+Time Taken: 45 sec
+
+18.Write a program to count the number of vowels in a string.
+
+Code:
+s = input()
+count = 0
+for ch in s:
+  if ch in "aeiouAEIOU":
+  count += 1
+  print(count)
+
+Input:
+hello
+
+Output:
+2
+
+Time Taken: 30 sec
+
+19.Write a program to find the largest element in a list.
+
+Code:
+n = int(input())
+arr = list(map(int, input().split()))
+largest = arr[0]
+for i in range(1, n):
+  if arr[i] > largest:
+    largest = arr[i]
+    print(largest)
+
+Input:
+5
+10 25 8 40 15
+
+Output:
+40
+
+Time Taken: 40 sec
+
+20.Write a program to remove duplicate elements from a list.
+
+Code:
+n = int(input())
+arr = list(map(int, input().split()))
+result = []
+for x in arr:
+  if x not in result:
+    result.append(x)
+    print(*result)
+
+Input:
+6
+1 2 2 3 1 4
+
+Output:
+1 2 3 4
+
+Time Taken: 45 sec

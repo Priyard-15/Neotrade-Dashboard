@@ -5,12 +5,14 @@ const finnhubClient = axios.create({
   timeout: 8000,
 })
 
+const marketApiKey = import.meta.env.VITE_FINNHUB_API_KEY || "d8h5egpr01qhjpmqma70d8h5egpr01qhjpmqma7g"
+
 export function hasMarketApiKey(){
-  return Boolean(import.meta.env.VITE_FINNHUB_API_KEY)
+  return Boolean(marketApiKey)
 }
 
 export async function fetchStockQuote(symbol){
-  const token = import.meta.env.VITE_FINNHUB_API_KEY
+  const token = marketApiKey
 
   if(!token){
     return null
@@ -41,16 +43,20 @@ export async function fetchStockQuotes(symbols){
   const rateLimited = results.some((result) => (
     result.status === "rejected" && result.reason?.response?.status === 429
   ))
+  const invalidKey = results.some((result) => (
+    result.status === "rejected" && [401, 403].includes(result.reason?.response?.status)
+  ))
 
   return {
     failedCount,
     quotes: Object.fromEntries(quotes.filter(([, quote]) => quote?.c)),
     rateLimited,
+    invalidKey,
   }
 }
 
 export async function fetchMarketNews(){
-  const token = import.meta.env.VITE_FINNHUB_API_KEY
+  const token = marketApiKey
 
   if(!token){
     return []
@@ -75,7 +81,7 @@ export async function fetchMarketNews(){
 }
 
 export async function fetchStockCandles(symbol){
-  const token = import.meta.env.VITE_FINNHUB_API_KEY
+  const token = marketApiKey
 
   if(!token){
     return []

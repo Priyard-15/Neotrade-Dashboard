@@ -1,180 +1,77 @@
-# 📈 NeoTrade AI – Stock Market Trend Analysis Dashboard
+# NeoTrade AI
 
-An AI-powered stock market dashboard that provides real-time stock prices, market trends, company insights, and interactive visualizations. Built using **React.js**, **Firebase**, **Tailwind CSS**, and the **Finnhub API**, the application delivers a fast, responsive, and user-friendly experience for monitoring stock market performance.
+NeoTrade AI is a placement-ready stock trend analysis workspace built with React, Tailwind CSS, Firebase Authentication, Recharts, and a Finnhub-ready quote service.
 
-🌐 **Live Demo:** https://neotrade-ai-26d0b.web.app
+## Highlights
 
----
+- Firebase login and registration flow
+- Searchable stock universe with sector filters and smart sorting
+- Live quote integration when `VITE_FINNHUB_API_KEY` is configured
+- **ML Prediction Engine**: Ensemble model (exponential smoothing, linear regression, MACD) forecasting next-day trends with confidence scores
+- **Anomaly Detection**: Real-time alerts for unusual price patterns, volume spikes, gaps, and reversal signals
+- Explainable trend engine with momentum, drawdown, relative-strength, and confidence scoring
+- Portfolio diagnostics with weighted AI score, concentration risk, diversification score, and rebalance actions
+- Watchlist, smart alerts, stock comparison, sector allocation, and market news panels
+- **Startup Analytics Integration**: Connect non-stock business data via API for KPI analysis
 
-## 🚀 Features
+## Resume Pitch
 
-- 🔐 Secure user authentication using Firebase Authentication
-- 📊 Real-time stock price tracking and market updates
-- 📈 Interactive charts and trend visualization
-- 🔍 Search companies and view detailed stock information
-- 📱 Responsive dashboard for desktop, tablet, and mobile
-- ⚡ Fast loading and intuitive user interface
+Built an authenticated financial analytics dashboard that combines market data, technical indicators, portfolio risk diagnostics, and explainable decision recommendations in a responsive React interface.
 
----
+## Tech Stack
 
-## 🛠️ Tech Stack
-
-### Frontend
-- React.js
-- JavaScript
-- HTML5
-- CSS3
+- React 19 and Vite
 - Tailwind CSS
-
-### Backend & Cloud
-- Firebase
 - Firebase Authentication
-- Firebase Hosting
+- Recharts
+- Axios
+- Finnhub API integration
+- Lucide React icons
 
-### API
-- Finnhub Stock Market API
-
----
-
-## 📂 Project Structure
-
-```
-Neotrade-Dashboard/
-├── public/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   ├── hooks/
-│   ├── assets/
-│   └── App.js
-├── .firebase/
-├── firebase.json
-├── package.json
-└── README.md
-```
-
----
-
-## 🏗️ Architecture
-
-```
-                User
-                  │
-                  ▼
-         React Frontend
-                  │
-         Firebase Authentication
-                  │
-                  ▼
-        Finnhub Stock Market API
-                  │
-                  ▼
-          Firebase Hosting
-```
-
----
-
-## 📸 Screenshots
-
-> Add your project screenshots inside an **assets/** folder.
-
-### Login Page
-
-![Login](assets/login.png)
-
-### Dashboard
-
-![Dashboard](assets/dashboard.png)
-
-### Stock Search
-
-![Search](assets/search.png)
-
-### Market Trends
-
-![Market](assets/market.png)
-
-### Interactive Charts
-
-![Charts](assets/chart.png)
-
----
-
-## ⚙️ Installation
-
-### Clone the repository
-
-```bash
-git clone https://github.com/Priyard-15/Neotrade-Dashboard.git
-```
-
-### Navigate to the project
-
-```bash
-cd Neotrade-Dashboard
-```
-
-### Install dependencies
+## Run Locally
 
 ```bash
 npm install
-```
-
-### Start the development server
-
-```bash
 npm run dev
 ```
 
-Open your browser and visit:
-
-```
-http://localhost:5173
-```
-
----
-
-## 💡 Future Enhancements
-
-- 📈 Portfolio tracking
-- ⭐ Watchlist functionality
-- 📊 Advanced technical indicators
-- 📰 AI-powered market news analysis
-- 📧 Price alerts and notifications
-- 🌙 Dark mode support
-
----
-
-## 🎯 Skills Demonstrated
-
-- Frontend Development
-- React.js
-- API Integration
-- Firebase Authentication
-- Responsive Web Design
-- Data Visualization
-- UI/UX Design
-- Cloud Deployment
-- State Management
-
----
-
-## 👩‍💻 Author
-
-**Priya Dharshini R**
-
-- GitHub: https://github.com/Priyard-15
-- LinkedIn: https://www.linkedin.com/in/priya-dharshini-805a03320/
-- Email: priyadharshinird1415@gmail.com
-
----
-
-## ⭐ If you like this project
-
-If you found this project useful, consider giving it a ⭐ on GitHub.
-Create a `.env` file when using live market quotes:
+Create a `.env` file when using live market quotes or startup analytics:
 
 ```bash
 VITE_FINNHUB_API_KEY=your_api_key
+VITE_STARTUP_ANALYTICS_API_BASE_URL=https://your-startup-api.example.com
 ```
+
+- `VITE_FINNHUB_API_KEY` enables live stock quote data.
+- `VITE_STARTUP_ANALYTICS_API_BASE_URL` enables the startup analytics connection.
+
+## Deployment
+
+Deploy to **Render**, **Heroku**, or **AWS** with one click:
+
+- **Render**: Connect GitHub repo → auto-deploy on push
+- **Heroku**: Use `app.json` or CLI (`heroku create && git push heroku main`)
+- **AWS**: Use CloudFormation template (`template.yaml`) for S3 + CloudFront hosting
+- **Docker**: `docker-compose up` for local testing or push to any container registry
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed step-by-step instructions.
+
+## Features
+
+### ML Prediction
+Ensemble model combining exponential smoothing, linear regression, and MACD for next-day trend forecasting with confidence scores.
+
+### Anomaly Detection
+Statistical and pattern-based detection of:
+- Extreme price movements (>5% daily change)
+- Volume spikes (>100% increase)
+- Opening gaps (>2% deviation)
+- Range expansions (wider than 2x average)
+- Reversal patterns (V-recovery, support plateaus, resistance rejection)
+
+### Startup Analytics
+Connect non-stock business data sources for KPI analysis:
+- Sales and revenue trends
+- Inventory levels
+- Customer metrics
+- Custom business data

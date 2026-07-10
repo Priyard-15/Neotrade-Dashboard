@@ -176,3 +176,56 @@ export function getPortfolioDiagnostics(stocks){
     weightedAiScore,
   }
 }
+
+export function getBacktestMetrics(stock){
+  const prices = stock.history.map((item) => item.price)
+  const firstPrice = prices[0]
+  const lastPrice = prices.at(-1)
+  const winningDays = prices.slice(1).filter((price, index) => price >= prices[index]).length
+  const totalSignals = Math.max(prices.length - 1, 1)
+  const returnPercent = Number((((lastPrice - firstPrice) / firstPrice) * 100).toFixed(2))
+  const buyAndHoldValue = Number((10000 * (lastPrice / firstPrice)).toFixed(0))
+  const strategyValue = Number((10000 * (1 + returnPercent / 100) * (stock.aiScore / 100)).toFixed(0))
+  const accuracy = Math.round((winningDays / totalSignals) * 100)
+  const edge = Number((returnPercent - stock.change).toFixed(2))
+  const signal = accuracy >= 65 && returnPercent > 0
+    ? "Validated bullish setup"
+    : accuracy < 45
+      ? "Weak historical follow-through"
+      : "Mixed confirmation"
+
+  return {
+    accuracy,
+    buyAndHoldValue,
+    edge,
+    returnPercent,
+    signal,
+    strategyValue,
+    totalSignals,
+    winningDays,
+  }
+}
+
+export function getInvestmentThesis(stock, riskProfile, technicalSignal, backtestMetrics){
+  const strength = technicalSignal.confidence >= 78
+    ? "high-conviction"
+    : technicalSignal.confidence >= 62
+      ? "selective"
+      : "cautious"
+  const riskLine = riskProfile.level === "High"
+    ? "Position sizing should stay controlled because volatility is elevated."
+    : riskProfile.level === "Medium"
+      ? "The setup is tradable, but entries should respect the stop-loss area."
+      : "The risk profile is relatively stable for a watchlist position."
+  const thesis = `${stock.symbol} presents a ${strength} ${technicalSignal.action.toLowerCase()} thesis with ${technicalSignal.momentum}% momentum, ${technicalSignal.confidence}% model confidence, and ${backtestMetrics.accuracy}% backtest accuracy across the recent sample.`
+  const catalyst = stock.change >= 0
+    ? `${stock.name} is showing positive price pressure and can stay on the active watchlist while trend confirmation holds.`
+    : `${stock.name} is under short-term pressure, so the dashboard favors protection until momentum improves.`
+  const risk = `${riskLine} Suggested target is ${formatCurrency(riskProfile.target, { maximumFractionDigits: 2 })} with a stop-loss idea near ${formatCurrency(riskProfile.stopLoss, { maximumFractionDigits: 2 })}.`
+
+  return {
+    catalyst,
+    risk,
+    thesis,
+  }
+}

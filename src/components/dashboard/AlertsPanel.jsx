@@ -24,13 +24,13 @@ function AlertsPanel({
         <BellRing size={21} className="text-cyan-200" />
 
         <h2 className="text-xl font-semibold">
-          Smart Alerts
+          Price Alerts
         </h2>
       </div>
 
       <label className="block">
         <span className="text-sm text-slate-300">
-          Alert price for {stock.symbol}
+          Price alert for {stock.symbol}
         </span>
 
         <input

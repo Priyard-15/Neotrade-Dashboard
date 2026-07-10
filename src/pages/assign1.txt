@@ -1,0 +1,201 @@
+print("Hello! Welcome to the Student Result Management System.")
+print("a.Admin")
+print("b.User")
+
+choose=input("Enter your option:")
+
+if choose=="a":
+
+    n = int(input("Enter number of students: "))
+
+    names = []
+    marks = []
+
+    for i in range(n):
+        name = input("Enter student name: ")
+        percentage = float(input("Enter percentage: "))
+
+        names.append(name)
+        marks.append(percentage)
+
+if choose=="b" or choose=="a":
+    
+    print("\nMenu")
+    print("1. Overall Result")
+    print("2. Result Count")
+    print("3. Top 3 Rank")
+    print("4. Specific Student")
+
+    choice = int(input("Enter your choice: "))
+
+# Overall Result
+if choice == 1:
+
+    print("\nOverall Result\n")
+
+    for i in range(n):
+
+        percentage = marks[i]
+
+        if percentage >= 91:
+            result = "First Class"
+
+        elif percentage >= 81:
+            result = "Excellent"
+
+        elif percentage >= 71:
+            result = "Very Good"
+
+        elif percentage >= 61:
+            result = "Good"
+
+        elif percentage >= 51:
+            result = "Pass"
+
+        elif percentage >= 40:
+            result = "Just Pass"
+
+        else:
+            result = "Fail"
+
+        print(names[i], "-", marks[i], "%", "-", result)
+
+
+# Result Count
+elif choice == 2:
+
+    first_class = 0
+    excellent = 0
+    very_good = 0
+    good = 0
+    passed = 0
+    just_pass = 0
+    fail = 0
+
+    for i in range(n):
+
+        percentage = marks[i]
+
+        if percentage >= 91:
+            first_class += 1
+
+        elif percentage >= 81:
+            excellent += 1
+
+        elif percentage >= 71:
+            very_good += 1
+
+        elif percentage >= 61:
+            good += 1
+
+        elif percentage >= 51:
+            passed += 1
+
+        elif percentage >= 40:
+            just_pass += 1
+
+        else:
+            fail += 1
+
+    print("\nResult Count\n")
+
+    print("First Class:", first_class)
+    print("Excellent:", excellent)
+    print("Very Good:", very_good)
+    print("Good:", good)
+    print("Pass:", passed)
+    print("Just Pass:", just_pass)
+    print("Fail:", fail)
+
+
+# Top 3 Rank
+elif choice == 3:
+
+    first = -1
+    second = -1
+    third = -1
+
+    first_index = -1
+    second_index = -1
+    third_index = -1
+
+    for i in range(n):
+
+        if marks[i] > first:
+            third = second
+            third_index = second_index
+
+            second = first
+            second_index = first_index
+
+            first = marks[i]
+            first_index = i
+
+        elif marks[i] > second:
+            third = second
+            third_index = second_index
+
+            second = marks[i]
+            second_index = i
+
+        elif marks[i] > third:
+            third = marks[i]
+            third_index = i
+
+    print("\nTop 3 Rank\n")
+
+    print("1st:", names[first_index], "-", first, "%")
+    print("2nd:", names[second_index], "-", second, "%")
+    print("3rd:", names[third_index], "-", third, "%")
+
+
+# Specific Student
+elif choice == 4:
+
+    search_name = input("Enter student name: ")
+
+    found = False
+
+    for i in range(n):
+
+        if names[i].lower() == search_name.lower():
+
+            percentage = marks[i]
+
+            if percentage >= 91:
+                result = "First Class"
+
+            elif percentage >= 81:
+                result = "Excellent"
+
+            elif percentage >= 71:
+                result = "Very Good"
+
+            elif percentage >= 61:
+                result = "Good"
+
+            elif percentage >= 51:
+                result = "Pass"
+
+            elif percentage >= 40:
+                result = "Just Pass"
+
+            else:
+                result = "Fail"
+
+            print("\nStudent Result")
+            print("Name:", names[i])
+            print("Percentage:", marks[i], "%")
+            print("Result:", result)
+
+            found = True
+            break
+
+    if found == False:
+        print("Student not found.")
+
+
+else:
+    print("Invalid choice")
+
+

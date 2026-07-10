@@ -1,4 +1,4 @@
-git add .# Logs
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -11,6 +11,14 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+.firebase/
+*.cache
+*.zip
 
 # Editor directories and files
 .vscode/*
