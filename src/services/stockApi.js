@@ -5,7 +5,7 @@ const finnhubClient = axios.create({
   timeout: 8000,
 })
 
-const marketApiKey = import.meta.env.VITE_FINNHUB_API_KEY || "d8h5egpr01qhjpmqma70d8h5egpr01qhjpmqma7g"
+const marketApiKey = import.meta.env.VITE_FINNHUB_API_KEY
 
 export function hasMarketApiKey(){
   return Boolean(marketApiKey)
